@@ -19,32 +19,36 @@ h1 {
 }
 
 #controls {
+    /* Contenedor principal para los botones */
     display: grid;
-    /* Define una cuadrícula de 3x3 para posicionar los botones */
+    /* Define una cuadrícula de 3x3 */
     grid-template-columns: repeat(3, 1fr); /* 3 columnas de igual ancho */
     grid-template-rows: repeat(3, 1fr);    /* 3 filas de igual alto */
-    gap: 5px; /* Espacio entre los botones */
-    width: 250px; /* Ancho total del área de control */
-    height: 250px; /* Alto total del área de control */
+    gap: 5px; /* Pequeño espacio entre los botones */
+    width: 200px; /* **Ancho total del área de control (reducido)** */
+    height: 200px; /* **Alto total del área de control (reducido)** */
     margin-top: 10px;
     align-items: center; /* Centra los items verticalmente en sus celdas */
     justify-items: center; /* Centra los items horizontalmente en sus celdas */
+    /* Alinea el grid completo al centro si el body es flexbox */
+    justify-content: center;
+    align-content: center;
 }
 
 #controls button {
     background-color: #4CAF50;
     color: white;
     border: none;
-    padding: 0; /* Quitamos padding aquí para que width/height den el tamaño total */
-    font-size: 24px;
+    padding: 0;
+    font-size: 20px; /* **Tamaño de fuente ligeramente reducido** */
     cursor: pointer;
     border-radius: 8px;
-    width: 80%; /* Ocupa la mayor parte de su celda */
-    height: 80%; /* Ocupa la mayor parte de su celda */
+    width: 80%; /* Ocupa un porcentaje de su celda */
+    height: 80%; /* Ocupa un porcentaje de su celda */
     display: flex;
     justify-content: center;
     align-items: center;
-    box-sizing: border-box; /* Para que padding/border no sumen al width/height */
+    box-sizing: border-box;
 }
 
 #controls button:active {
