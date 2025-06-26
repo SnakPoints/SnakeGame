@@ -1,87 +1,102 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #222;
-    color: #eee;
-    margin: 20px;
-}
-
-canvas {
-    background-color: #333;
-    border: 2px solid #555;
-    margin-bottom: 20px;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #282c34; /* Fondo oscuro moderno */
+    color: #e0e0e0; /* Color de texto claro */
 }
 
 h1 {
-    color: #4CAF50;
+    color: #61dafb; /* Un color de acento vibrante */
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-#controls {
-    /* Contenedor principal para los botones */
+#game-area {
+    margin-bottom: 30px;
+    border: 5px solid #61dafb; /* Borde del juego */
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(97, 218, 251, 0.5); /* Sombra brillante */
+    overflow: hidden; /* Asegura que el canvas se mantenga dentro del borde redondeado */
+}
+
+#gameCanvas {
+    background-color: #3a3f47; /* Fondo del canvas ligeramente más claro */
+    display: block; /* Elimina espacio extra debajo del canvas */
+}
+
+.button-controls {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #3a3f47;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+.button-container {
     display: grid;
-    /* Define una cuadrícula de 3x3 */
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas de igual ancho */
-    grid-template-rows: repeat(3, 1fr);    /* 3 filas de igual alto */
-    gap: 5px; /* Pequeño espacio entre los botones */
-    width: 200px; /* **Ancho total del área de control (reducido)** */
-    height: 200px; /* **Alto total del área de control (reducido)** */
-    margin-top: 10px;
-    align-items: center; /* Centra los items verticalmente en sus celdas */
-    justify-items: center; /* Centra los items horizontalmente en sus celdas */
-    /* Alinea el grid completo al centro si el body es flexbox */
-    justify-content: center;
-    align-content: center;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 200px; /* Tamaño un poco más grande para los controles */
+    gap: 8px; /* Espacio entre los botones */
 }
 
-#controls button {
-    background-color: #4CAF50;
+.arrow-button {
+    width: 60px; /* Tamaño del botón */
+    height: 60px; /* Tamaño del botón */
+    background-color: #4CAF50; /* Verde vibrante para los botones */
     color: white;
     border: none;
-    padding: 0;
-    font-size: 20px; /* **Tamaño de fuente ligeramente reducido** */
-    cursor: pointer;
-    border-radius: 8px;
-    width: 80%; /* Ocupa un porcentaje de su celda */
-    height: 80%; /* Ocupa un porcentaje de su celda */
+    border-radius: 10px; /* Bordes suaves */
+    font-size: 2.2em; /* Flechas más grandes y legibles */
+    font-weight: bold;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-sizing: border-box;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra sutil */
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease; /* Transiciones suaves */
 }
 
-#controls button:active {
-    background-color: #45a049;
+.arrow-button:hover {
+    background-color: #45a049; /* Verde más oscuro al pasar el ratón */
+    transform: translateY(-3px); /* Efecto "elevado" */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Posicionamiento de cada botón para formar la cruz */
-#upBtn {
-    grid-column: 2; /* Columna del medio */
-    grid-row: 1;    /* Fila de arriba */
+.arrow-button:active {
+    background-color: #3e8e41; /* Verde más oscuro al hacer clic */
+    transform: translateY(0); /* Vuelve a la posición normal */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-#leftBtn {
-    grid-column: 1; /* Columna de la izquierda */
-    grid-row: 2;    /* Fila del medio */
+/* Posicionamiento de los botones en la cuadrícula */
+.up {
+    grid-column: 2;
+    grid-row: 1;
 }
 
-#rightBtn {
-    grid-column: 3; /* Columna de la derecha */
-    grid-row: 2;    /* Fila del medio */
+.left {
+    grid-column: 1;
+    grid-row: 2;
 }
 
-#downBtn {
-    grid-column: 2; /* Columna del medio */
-    grid-row: 3;    /* Fila de abajo */
+.right {
+    grid-column: 3;
+    grid-row: 2;
 }
 
-p {
-    font-size: 20px;
-    margin-top: 15px;
+.down {
+    grid-column: 2;
+    grid-row: 3;
 }
 
-#score {
-    font-weight: bold;
-    color: #FFD700; /* Oro */
+.empty {
+    /* Mantiene el espacio vacío en la cuadrícula, no visible */
+    visibility: hidden;
+    pointer-events: none; /* Asegura que no sea interactivo */
 }
