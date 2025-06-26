@@ -1,8 +1,9 @@
-document.addEventListener('DOMContentLoaded', () => {
+Document.addEventListener('DOMContentLoaded', () => {
     // Referencias a los elementos del DOM
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    const scoreDisplay = document.getElementById('scoreDisplay'); // Asegúrate de que este ID coincida con tu HTML
+    const scoreDisplay = document.getElementById('score'); // ID corregido a 'score' según tu HTML actual
+    const startButton = document.getElementById('startButton'); // NUEVA LÍNEA: Referencia al botón de inicio
 
     // Configuración del juego
     const gridSize = 20; // Tamaño de cada "cuadro" de la serpiente y la comida (en píxeles)
@@ -18,8 +19,36 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameInterval;     // Variable para almacenar el ID del setInterval (bucle del juego)
     let changingDirection = false; // Bandera para evitar cambios de dirección múltiples por tick
     let gameSpeed = 150;  // Velocidad inicial del juego (milisegundos entre cada actualización)
+    let gameStarted = false; // NUEVA LÍNEA: Bandera para controlar si el juego ha iniciado
+
+    // Obtener referencias a los botones de control (mantengo los IDs que me indicaste en el HTML)
+    const upBtn = document.getElementById('upBtn');
+    const downBtn = document.getElementById('downBtn');
+    const leftBtn = document.getElementById('leftBtn');
+    const rightBtn = document.getElementById('rightBtn');
+
+    // Asignar eventos de clic a los botones de dirección
+    upBtn.addEventListener('click', () => changeDirection(0, -1));
+    downBtn.addEventListener('click', () => changeDirection(0, 1));
+    leftBtn.addEventListener('click', () => changeDirection(-1, 0));
+    rightBtn.addEventListener('click', () => changeDirection(1, 0));
+
+    // NUEVA LÍNEA: Evento para el botón de inicio
+    startButton.addEventListener('click', handleStartButtonClick);
 
     // --- Funciones del Juego ---
+
+    // NUEVA FUNCIÓN: Manejador del clic del botón de inicio
+    function handleStartButtonClick() {
+        if (!gameStarted) { // Si el juego no ha comenzado
+            gameStarted = true; // Establecer el estado a "iniciado"
+            startButton.style.display = 'none'; // Ocultar el botón de inicio/reinicio
+            resetGame(); // Reiniciar el juego para asegurar un estado limpio y generar comida
+            // Iniciar el bucle del juego aquí, ya que resetGame ahora no lo hace automáticamente
+            gameInterval = setInterval(update, gameSpeed);
+        }
+    }
+
 
     /**
      * Genera una nueva posición aleatoria para la comida en el tablero,
@@ -47,6 +76,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Limpiar todo el canvas en cada fotograma antes de redibujar
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        // Dibujar el fondo del canvas (tu código original usaba ctx.fillStyle en clearCanvas)
+        ctx.fillStyle = '#333';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#555';
+        ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+
         // Dibujar la comida
         ctx.fillStyle = 'red';       // Color de relleno de la comida
         ctx.strokeStyle = 'darkred'; // Color del borde de la comida
@@ -55,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.strokeRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
 
         // Dibujar la serpiente
-        ctx.fillStyle = 'lime';      // Color de relleno de los segmentos de la serpiente
+        ctx.fillStyle = 'lightgreen';      // Color de relleno de los segmentos de la serpiente
         ctx.strokeStyle = 'darkgreen'; // Color del borde de los segmentos
         snake.forEach(segment => {
             // Convierte las coordenadas de la cuadrícula a píxeles para dibujar en el canvas
@@ -69,6 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
      * Mueve la serpiente, detecta colisiones y maneja la lógica de comer.
      */
     function update() {
+        // NUEVA LÍNEA: Si el juego no está iniciado, no hacer nada en este tick
+        if (!gameStarted) return;
+
         // Crea la nueva posición de la cabeza de la serpiente
         const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
@@ -118,8 +157,12 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function endGame() {
         clearInterval(gameInterval); // Detiene el bucle principal del juego
+        gameStarted = false; // NUEVA LÍNEA: El juego ha terminado
+        startButton.textContent = 'Volver a Jugar'; // NUEVA LÍNEA: Cambiar texto del botón
+        startButton.style.display = 'block'; // NUEVA LÍNEA: Mostrar el botón de nuevo
         alert(`¡Juego Terminado! Tu puntuación fue: ${score}\nPresiona OK para jugar de nuevo.`);
-        resetGame(); // Reinicia todas las variables y el estado del juego
+        // Nota: resetGame() se llama indirectamente a través de handleStartButtonClick() para un nuevo juego.
+        // Aquí solo se muestra la alerta y se prepara el botón de reinicio.
     }
 
     /**
@@ -128,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetGame() {
         // Posición inicial de la serpiente en el centro del tablero
         snake = [{ x: Math.floor(tileCount / 2), y: Math.floor(tileCount / 2) }];
-        dx = 1; // Dirección inicial a la derecha (para que empiece a moverse)
+        dx = 1; // Dirección inicial a la derecha (para que empiece a moverse al iniciar)
         dy = 0;
         score = 0;
         scoreDisplay.textContent = score; // Restablece la puntuación visible
@@ -138,12 +181,11 @@ document.addEventListener('DOMContentLoaded', () => {
         generateFood(); // Genera la primera comida
         draw(); // Dibuja el estado inicial de la serpiente y la comida en el canvas
 
-        // Limpia cualquier intervalo de juego que pueda estar activo antes de iniciar uno nuevo
+        // Importante: NO INICIAMOS EL gameInterval AQUÍ.
+        // El gameInterval se inicia solo cuando se presiona el botón de inicio/reinicio.
         if (gameInterval) {
-            clearInterval(gameInterval);
+            clearInterval(gameInterval); // Asegurarse de que no haya intervalos antiguos corriendo
         }
-        // Inicia el bucle principal del juego, haciendo que la serpiente empiece a moverse automáticamente
-        gameInterval = setInterval(update, gameSpeed);
     }
 
     // --- Control de Dirección (Teclado y Botones Táctiles) ---
@@ -154,6 +196,9 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {number} newDy - Nueva dirección en el eje Y (1, -1, o 0).
      */
     function changeDirection(newDx, newDy) {
+        // NUEVA LÍNEA: Solo permitir cambios de dirección si el juego está en curso
+        if (!gameStarted) return;
+
         if (changingDirection) return; // Si ya se está procesando un cambio, ignorar inputs adicionales
         changingDirection = true; // Establece la bandera para evitar inputs muy rápidos
 
@@ -169,6 +214,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event Listener para las teclas del teclado
     document.addEventListener('keydown', e => {
+        // NUEVA LÍNEA: Solo responder a las teclas si el juego está iniciado
+        if (!gameStarted) return;
+
         // Usa e.key para mayor legibilidad y compatibilidad con diferentes distribuciones de teclado
         switch (e.key) {
             case 'ArrowUp':
@@ -191,6 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Event Listeners para los botones táctiles (asegúrate que tus botones en HTML tienen los IDs correctos)
+    // NUEVA LÍNEA: Se añaden dentro del DOMContentLoaded para asegurar que los elementos existen
+    // (Esto ya estaba en tu código, pero lo reconfirmo)
     document.getElementById('upBtn').addEventListener('click', () => changeDirection(0, -1));
     document.getElementById('downBtn').addEventListener('click', () => changeDirection(0, 1));
     document.getElementById('leftBtn').addEventListener('click', () => changeDirection(-1, 0));
@@ -198,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Inicialización del Juego ---
     // Esta función se llama una vez cuando el DOM está completamente cargado
-    // para configurar el estado inicial del juego y comenzar el bucle.
-    resetGame();
+    // para configurar el estado inicial del juego y NO iniciar el bucle automáticamente.
+    // El juego se inicia con el botón.
+    resetGame(); // Prepara el tablero y la serpiente/comida sin iniciar el movimiento
 });
