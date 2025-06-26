@@ -1,0 +1,82 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #222;
+    color: #eee;
+    margin: 20px;
+}
+
+canvas {
+    background-color: #333;
+    border: 2px solid #555;
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #4CAF50;
+}
+
+#controls {
+    /* Cambios aquí para la nueva disposición */
+    display: grid; /* Usamos CSS Grid para un control preciso */
+    grid-template-columns: repeat(3, 1fr); /* Tres columnas de igual ancho */
+    grid-template-rows: repeat(3, 1fr); /* Tres filas de igual alto */
+    gap: 5px; /* Espacio entre los botones */
+    width: 250px; /* Ancho total de la cuadrícula de botones */
+    height: 250px; /* Alto total de la cuadrícula de botones */
+    margin-top: 10px;
+    align-items: center;
+    justify-items: center;
+}
+
+#controls button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 15px; /* Ajustado para que el tamaño lo dé la cuadrícula */
+    font-size: 24px;
+    cursor: pointer;
+    border-radius: 8px;
+    width: 100%; /* Ocupa todo el espacio de su celda en la cuadrícula */
+    height: 100%; /* Ocupa todo el espacio de su celda en la cuadrícula */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#controls button:active {
+    background-color: #45a049;
+}
+
+/* Posicionamiento específico de los botones en la cuadrícula */
+#upBtn {
+    grid-column: 2; /* Columna central */
+    grid-row: 1;    /* Fila superior */
+}
+
+#leftBtn {
+    grid-column: 1; /* Columna izquierda */
+    grid-row: 2;    /* Fila central */
+}
+
+#rightBtn {
+    grid-column: 3; /* Columna derecha */
+    grid-row: 2;    /* Fila central */
+}
+
+#downBtn {
+    grid-column: 2; /* Columna central */
+    grid-row: 3;    /* Fila inferior */
+}
+
+p {
+    font-size: 20px;
+    margin-top: 15px;
+}
+
+#score {
+    font-weight: bold;
+    color: #FFD700; /* Oro */
+}
