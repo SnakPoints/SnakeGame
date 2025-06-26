@@ -1,153 +1,203 @@
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const scoreDisplay = document.getElementById('score');
+document.addEventListener('DOMContentLoaded', () => {
+    // Referencias a los elementos del DOM
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('scoreDisplay'); // Asegúrate de que este ID coincida con tu HTML
 
-const gridSize = 20; // Tamaño de cada "cuadro"
-const canvasSize = canvas.width; // 400
-let snake = [{ x: 200, y: 200 }]; // Posición inicial de la serpiente
-let food = {}; // Objeto para la comida
-let dx = gridSize; // Dirección X (inicialmente a la derecha)
-let dy = 0;   // Dirección Y
-let score = 0;
-let changingDirection = false; // Para evitar movimientos dobles rápidos
-let gameInterval;
-let gameSpeed = 150; // Velocidad inicial (ms entre frames)
+    // Configuración del juego
+    const gridSize = 20; // Tamaño de cada "cuadro" de la serpiente y la comida (en píxeles)
+    // Calcula tileCount basado en el tamaño REAL del canvas (definido en HTML)
+    const tileCount = canvas.width / gridSize; // Número de cuadros que caben en una fila/columna
 
-// --- Funciones del juego ---
+    // Variables de estado del juego
+    let snake = [];       // Array que contendrá los segmentos de la serpiente
+    let food = {};        // Objeto que contendrá la posición de la comida
+    let dx = 0;           // Dirección X actual de la serpiente (1: derecha, -1: izquierda, 0: no horizontal)
+    let dy = 0;           // Dirección Y actual de la serpiente (1: abajo, -1: arriba, 0: no vertical)
+    let score = 0;        // Puntuación del jugador
+    let gameInterval;     // Variable para almacenar el ID del setInterval (bucle del juego)
+    let changingDirection = false; // Bandera para evitar cambios de dirección múltiples por tick
+    let gameSpeed = 150;  // Velocidad inicial del juego (milisegundos entre cada actualización)
 
-function generateFood() {
-    food = {
-        x: Math.floor(Math.random() * (canvasSize / gridSize)) * gridSize,
-        y: Math.floor(Math.random() * (canvasSize / gridSize)) * gridSize
-    };
-    // Asegurarse de que la comida no aparezca sobre la serpiente
-    snake.forEach(segment => {
-        if (segment.x === food.x && segment.y === food.y) {
-            generateFood(); // Regenerar si la comida está en la serpiente
+    // --- Funciones del Juego ---
+
+    /**
+     * Genera una nueva posición aleatoria para la comida en el tablero,
+     * asegurándose de que no aparezca sobre la serpiente.
+     */
+    function generateFood() {
+        food = {
+            x: Math.floor(Math.random() * tileCount),
+            y: Math.floor(Math.random() * tileCount)
+        };
+
+        // Verifica si la nueva posición de la comida colisiona con algún segmento de la serpiente
+        for (let i = 0; i < snake.length; i++) {
+            if (snake[i].x === food.x && snake[i].y === food.y) {
+                generateFood(); // Si hay colisión, intenta generar una nueva posición recursivamente
+                return; // Importante: Sale de la ejecución actual para usar la nueva llamada recursiva
+            }
+        }
+    }
+
+    /**
+     * Dibuja todos los elementos del juego (tablero, comida, serpiente) en el canvas.
+     */
+    function draw() {
+        // Limpiar todo el canvas en cada fotograma antes de redibujar
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Dibujar la comida
+        ctx.fillStyle = 'red';       // Color de relleno de la comida
+        ctx.strokeStyle = 'darkred'; // Color del borde de la comida
+        // Convierte las coordenadas de la cuadrícula a píxeles para dibujar en el canvas
+        ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+        ctx.strokeRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+
+        // Dibujar la serpiente
+        ctx.fillStyle = 'lime';      // Color de relleno de los segmentos de la serpiente
+        ctx.strokeStyle = 'darkgreen'; // Color del borde de los segmentos
+        snake.forEach(segment => {
+            // Convierte las coordenadas de la cuadrícula a píxeles para dibujar en el canvas
+            ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+            ctx.strokeRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+        });
+    }
+
+    /**
+     * Actualiza el estado del juego en cada "tick" (movimiento de la serpiente).
+     * Mueve la serpiente, detecta colisiones y maneja la lógica de comer.
+     */
+    function update() {
+        // Crea la nueva posición de la cabeza de la serpiente
+        const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+
+        // 1. Detección de colisiones con los bordes del canvas
+        if (
+            head.x < 0 || head.x >= tileCount || // Fuera de los límites horizontales
+            head.y < 0 || head.y >= tileCount    // Fuera de los límites verticales
+        ) {
+            endGame(); // Si colisiona con un borde, termina el juego
+            return;    // Sale de la función update para evitar más lógica
+        }
+
+        // 2. Detección de colisiones con el propio cuerpo de la serpiente
+        // Itera desde el segundo segmento (índice 1) para evitar que la cabeza colisione consigo misma
+        for (let i = 1; i < snake.length; i++) {
+            if (head.x === snake[i].x && head.y === snake[i].y) {
+                endGame(); // Si colisiona con su cuerpo, termina el juego
+                return;    // Sale de la función update
+            }
+        }
+
+        // Añade la nueva cabeza al principio del array de la serpiente
+        snake.unshift(head);
+
+        // 3. Lógica de comida: Si la nueva cabeza colisiona con la comida
+        if (head.x === food.x && head.y === food.y) {
+            score++; // Incrementa la puntuación
+            scoreDisplay.textContent = score; // Actualiza el marcador visible en el HTML
+            generateFood(); // Genera una nueva posición para la comida
+
+            // Aumenta la velocidad del juego al comer (opcional)
+            gameSpeed = Math.max(50, gameSpeed - 5); // Disminuye el intervalo (aumenta velocidad), mínimo 50ms
+            clearInterval(gameInterval); // Detiene el intervalo actual
+            gameInterval = setInterval(update, gameSpeed); // Inicia un nuevo intervalo con la nueva velocidad
+        } else {
+            // Si la serpiente no comió, elimina el último segmento (la cola)
+            // Esto mantiene la longitud de la serpiente constante hasta que come
+            snake.pop();
+        }
+
+        draw(); // Vuelve a dibujar todos los elementos en sus nuevas posiciones
+        changingDirection = false; // Restablece la bandera para permitir el siguiente cambio de dirección
+    }
+
+    /**
+     * Finaliza el juego, muestra una alerta con la puntuación y reinicia el estado.
+     */
+    function endGame() {
+        clearInterval(gameInterval); // Detiene el bucle principal del juego
+        alert(`¡Juego Terminado! Tu puntuación fue: ${score}\nPresiona OK para jugar de nuevo.`);
+        resetGame(); // Reinicia todas las variables y el estado del juego
+    }
+
+    /**
+     * Reinicia todas las variables del juego a su estado inicial y lo prepara para una nueva partida.
+     */
+    function resetGame() {
+        // Posición inicial de la serpiente en el centro del tablero
+        snake = [{ x: Math.floor(tileCount / 2), y: Math.floor(tileCount / 2) }];
+        dx = 1; // Dirección inicial a la derecha (para que empiece a moverse)
+        dy = 0;
+        score = 0;
+        scoreDisplay.textContent = score; // Restablece la puntuación visible
+        changingDirection = false;
+        gameSpeed = 150; // Restablece la velocidad inicial
+
+        generateFood(); // Genera la primera comida
+        draw(); // Dibuja el estado inicial de la serpiente y la comida en el canvas
+
+        // Limpia cualquier intervalo de juego que pueda estar activo antes de iniciar uno nuevo
+        if (gameInterval) {
+            clearInterval(gameInterval);
+        }
+        // Inicia el bucle principal del juego, haciendo que la serpiente empiece a moverse automáticamente
+        gameInterval = setInterval(update, gameSpeed);
+    }
+
+    // --- Control de Dirección (Teclado y Botones Táctiles) ---
+
+    /**
+     * Maneja el cambio de dirección de la serpiente, validando movimientos no permitidos.
+     * @param {number} newDx - Nueva dirección en el eje X (1, -1, o 0).
+     * @param {number} newDy - Nueva dirección en el eje Y (1, -1, o 0).
+     */
+    function changeDirection(newDx, newDy) {
+        if (changingDirection) return; // Si ya se está procesando un cambio, ignorar inputs adicionales
+        changingDirection = true; // Establece la bandera para evitar inputs muy rápidos
+
+        // Evita que la serpiente se mueva instantáneamente en la dirección opuesta a su movimiento actual
+        // Ejemplo: Si va a la derecha (dx=1), no puede ir instantáneamente a la izquierda (newDx=-1)
+        if (dx === -newDx && newDx !== 0) return;
+        if (dy === -newDy && newDy !== 0) return;
+
+        // Aplica la nueva dirección
+        dx = newDx;
+        dy = newDy;
+    }
+
+    // Event Listener para las teclas del teclado
+    document.addEventListener('keydown', e => {
+        // Usa e.key para mayor legibilidad y compatibilidad con diferentes distribuciones de teclado
+        switch (e.key) {
+            case 'ArrowUp':
+            case 'w': // Permitir también 'w' para arriba
+                changeDirection(0, -1); // Mover arriba
+                break;
+            case 'ArrowDown':
+            case 's': // Permitir también 's' para abajo
+                changeDirection(0, 1);  // Mover abajo
+                break;
+            case 'ArrowLeft':
+            case 'a': // Permitir también 'a' para izquierda
+                changeDirection(-1, 0); // Mover izquierda
+                break;
+            case 'ArrowRight':
+            case 'd': // Permitir también 'd' para derecha
+                changeDirection(1, 0);  // Mover derecha
+                break;
         }
     });
-}
 
-function draw() {
-    ctx.clearRect(0, 0, canvasSize, canvasSize); // Limpiar el canvas
-    snake.forEach(drawSnakeSegment);
-    drawFood();
-}
+    // Event Listeners para los botones táctiles (asegúrate que tus botones en HTML tienen los IDs correctos)
+    document.getElementById('upBtn').addEventListener('click', () => changeDirection(0, -1));
+    document.getElementById('downBtn').addEventListener('click', () => changeDirection(0, 1));
+    document.getElementById('leftBtn').addEventListener('click', () => changeDirection(-1, 0));
+    document.getElementById('rightBtn').addEventListener('click', () => changeDirection(1, 0));
 
-function drawSnakeSegment(segment) {
-    ctx.fillStyle = 'lightgreen';
-    ctx.strokeStyle = 'darkgreen';
-    ctx.fillRect(segment.x, segment.y, gridSize, gridSize);
-    ctx.strokeRect(segment.x, segment.y, gridSize, gridSize);
-}
-
-function drawFood() {
-    ctx.fillStyle = 'red';
-    ctx.strokeStyle = 'darkred';
-    ctx.fillRect(food.x, food.y, gridSize, gridSize);
-    ctx.strokeRect(food.x, food.y, gridSize, gridSize);
-}
-
-function moveSnake() {
-    const head = { x: snake[0].x + dx, y: snake[0].y + dy };
-
-    // Colisión con los bordes
-    if (head.x < 0 || head.x >= canvasSize || head.y < 0 || head.y >= canvasSize) {
-        gameOver();
-        return;
-    }
-
-    // Colisión con el propio cuerpo
-    for (let i = 1; i < snake.length; i++) {
-        if (head.x === snake[i].x && head.y === snake[i].y) {
-            gameOver();
-            return;
-        }
-    }
-
-    snake.unshift(head); // Añadir nueva cabeza
-
-    // Comió comida
-    if (head.x === food.x && head.y === food.y) {
-        score++;
-        scoreDisplay.textContent = score;
-        generateFood(); // Generar nueva comida
-        // Aumentar la velocidad (disminuir el intervalo)
-        gameSpeed = Math.max(50, gameSpeed - 5); // Velocidad mínima de 50ms
-        clearInterval(gameInterval);
-        gameInterval = setInterval(gameTick, gameSpeed);
-    } else {
-        snake.pop(); // Eliminar la cola si no comió
-    }
-    changingDirection = false;
-}
-
-function gameOver() {
-    clearInterval(gameInterval);
-    alert(`¡Juego Terminado! Tu puntuación fue: ${score}\nPresiona OK para jugar de nuevo.`);
+    // --- Inicialización del Juego ---
+    // Esta función se llama una vez cuando el DOM está completamente cargado
+    // para configurar el estado inicial del juego y comenzar el bucle.
     resetGame();
-}
-
-function resetGame() {
-    snake = [{ x: 200, y: 200 }];
-    dx = gridSize;
-    dy = 0;
-    score = 0;
-    scoreDisplay.textContent = score;
-    gameSpeed = 150;
-    generateFood();
-    gameInterval = setInterval(gameTick, gameSpeed);
-}
-
-function gameTick() {
-    moveSnake();
-    draw();
-}
-
-// --- Controles (Teclas y Botones Táctiles) ---
-
-function changeDirection(event) {
-    if (changingDirection) return;
-    changingDirection = true;
-
-    const keyPressed = event.keyCode;
-    const goingUp = dy === -gridSize;
-    const goingDown = dy === gridSize;
-    const goingRight = dx === gridSize;
-    const goingLeft = dx === -gridSize;
-
-    // Teclas de flecha
-    if (keyPressed === 37 && !goingRight) { dx = -gridSize; dy = 0; } // Izquierda
-    if (keyPressed === 38 && !goingDown) { dx = 0; dy = -gridSize; } // Arriba
-    if (keyPressed === 39 && !goingLeft) { dx = gridSize; dy = 0; }  // Derecha
-    if (keyPressed === 40 && !goingUp) { dx = 0; dy = gridSize; }    // Abajo
-}
-
-function changeDirectionFromButton(direction) {
-    if (changingDirection) return;
-    changingDirection = true;
-
-    const goingUp = dy === -gridSize;
-    const goingDown = dy === gridSize;
-    const goingRight = dx === gridSize;
-    const goingLeft = dx === -gridSize;
-
-    if (direction === 'up' && !goingDown) { dx = 0; dy = -gridSize; }
-    if (direction === 'down' && !goingUp) { dx = 0; dy = gridSize; }
-    if (direction === 'left' && !goingRight) { dx = -gridSize; dy = 0; }
-    if (direction === 'right' && !goingLeft) { dx = gridSize; dy = 0; }
-}
-
-
-// --- Event Listeners ---
-document.addEventListener('keydown', changeDirection); // Para teclado
-
-// Botones táctiles
-document.getElementById('upBtn').addEventListener('click', () => changeDirectionFromButton('up'));
-document.getElementById('downBtn').addEventListener('click', () => changeDirectionFromButton('down'));
-document.getElementById('leftBtn').addEventListener('click', () => changeDirectionFromButton('left'));
-document.getElementById('rightBtn').addEventListener('click', () => changeDirectionFromButton('right'));
-
-// --- Iniciar el juego ---
-generateFood();
-gameInterval = setInterval(gameTick, gameSpeed);
+});
