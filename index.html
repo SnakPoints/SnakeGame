@@ -3,22 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Web TÃ¡ctil</title>
+    <title>Juego de la Serpiente Moderno</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>ğŸ Snake Web TÃ¡ctil ğŸ</h1>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <div id="controls">
-        <button id="upBtn">â¬†ï¸</button>
-        <div class="horizontal-controls">
-            <button id="leftBtn">â¬…ï¸</button>
-            <button id="rightBtn">â¡ï¸</button>
-        </div>
-        <button id="downBtn">â¬‡ï¸</button>
-    </div>
-    <p>PuntuaciÃ³n: <span id="score">0</span></p>
 
-    <script src="script.js"></script>
+    <h1>Juego de la Serpiente</h1>
+
+    <div id="game-area">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+    </div>
+
+    <div class="button-controls">
+        <div class="button-container">
+            <div class="empty"></div>
+            <button class="arrow-button up" aria-label="Mover arriba">¡ü</button>
+            <div class="empty"></div>
+
+            <button class="arrow-button left" aria-label="Mover izquierda">¡û</button>
+            <div class="empty"></div> 
+            <button class="arrow-button right" aria-label="Mover derecha">¡ú</button>
+
+            <div class="empty"></div>
+            <button class="arrow-button down" aria-label="Mover abajo">¡ı</button>
+            <div class="empty"></div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
 </body>
 </html>
