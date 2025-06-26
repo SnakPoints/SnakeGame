@@ -1,102 +1,120 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    min-height: 100vh; /* Ocupa al menos el 100% de la altura de la ventana */
+    background-color: #282c34; /* Color de fondo similar al de tu imagen */
+    color: white; /* Color del texto general */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente más moderna */
     margin: 0;
-    background-color: #282c34; /* Fondo oscuro moderno */
-    color: #e0e0e0; /* Color de texto claro */
+    padding: 20px; /* Espacio alrededor del contenido */
+    box-sizing: border-box; /* Incluye padding y border en el tamaño total */
 }
 
 h1 {
-    color: #61dafb; /* Un color de acento vibrante */
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    color: #00FFFF; /* Color cian para el título, como en tu imagen */
+    margin-bottom: 25px; /* Más espacio debajo del título */
+    font-size: 2.5em; /* Tamaño de fuente más grande */
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5); /* Sombra de texto para resaltar */
 }
 
-#game-area {
-    margin-bottom: 30px;
-    border: 5px solid #61dafb; /* Borde del juego */
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(97, 218, 251, 0.5); /* Sombra brillante */
-    overflow: hidden; /* Asegura que el canvas se mantenga dentro del borde redondeado */
+#gameContainer {
+    border: 2px solid #00FFFF; /* Borde de color cian, similar al de tu imagen */
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6); /* Sombra más pronunciada para el contenedor */
+    background-color: #1a1a1d; /* Fondo más oscuro para el área del juego */
+    margin-bottom: 15px; /* Espacio entre el juego y la puntuación */
+    border-radius: 8px; /* Bordes ligeramente redondeados */
+    overflow: hidden; /* Asegura que el canvas no sobresalga si los bordes son redondeados */
 }
 
 #gameCanvas {
-    background-color: #3a3f47; /* Fondo del canvas ligeramente más claro */
-    display: block; /* Elimina espacio extra debajo del canvas */
+    background-color: #000; /* Un fondo negro para el canvas */
+    display: block; /* Elimina el espacio extra que algunos navegadores añaden debajo del canvas */
 }
 
-.button-controls {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #3a3f47;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+p#scoreDisplay {
+    margin-top: 15px; /* Espacio entre el canvas y la puntuación */
+    font-size: 1.6em; /* Tamaño de fuente más grande para la puntuación */
+    font-weight: bold;
+    color: #f0f0f0; /* Color de texto ligeramente gris claro */
+    text-align: center;
 }
 
-.button-container {
+#controls {
+    margin-top: 40px; /* Más espacio entre puntuación y controles */
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    width: 200px; /* Tamaño un poco más grande para los controles */
-    gap: 8px; /* Espacio entre los botones */
+    grid-template-areas:
+        ". up ."
+        "left . right"
+        ". down .";
+    gap: 15px; /* Espacio entre los botones */
+    background-color: #3a3a3a; /* Fondo oscuro para la caja de controles */
+    padding: 25px; /* Más padding para la caja */
+    border-radius: 15px; /* Bordes más redondeados */
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.5); /* Sombra para los controles */
 }
 
 .arrow-button {
-    width: 60px; /* Tamaño del botón */
-    height: 60px; /* Tamaño del botón */
-    background-color: #4CAF50; /* Verde vibrante para los botones */
+    width: 75px; /* Tamaño de los botones */
+    height: 75px;
+    background-color: #4CAF50; /* Verde, como en tu imagen */
     color: white;
     border: none;
-    border-radius: 10px; /* Bordes suaves */
-    font-size: 2.2em; /* Flechas más grandes y legibles */
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    border-radius: 10px; /* Bordes redondeados */
+    font-size: 32px; /* Tamaño de la flecha */
     cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra sutil */
-    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease; /* Transiciones suaves */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 2px 2px 7px rgba(0,0,0,0.4);
+    transition: background-color 0.2s ease, transform 0.1s ease; /* Transiciones suaves */
+    user-select: none; /* Evita la selección de texto al hacer clic */
+    -webkit-tap-highlight-color: transparent; /* Elimina el resalte azul en móviles al tocar */
 }
 
 .arrow-button:hover {
-    background-color: #45a049; /* Verde más oscuro al pasar el ratón */
-    transform: translateY(-3px); /* Efecto "elevado" */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    background-color: #45a049; /* Verde ligeramente más oscuro al pasar el ratón */
+    transform: translateY(-3px); /* Pequeño efecto de elevación */
 }
 
 .arrow-button:active {
     background-color: #3e8e41; /* Verde más oscuro al hacer clic */
-    transform: translateY(0); /* Vuelve a la posición normal */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateY(1px); /* Efecto de "presión" */
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.4);
 }
 
-/* Posicionamiento de los botones en la cuadrícula */
-.up {
-    grid-column: 2;
-    grid-row: 1;
+/* Asignación de áreas de la cuadrícula a cada botón */
+.arrow-button.up { grid-area: up; }
+.arrow-button.down { grid-area: down; }
+.arrow-button.left { grid-area: left; }
+.arrow-button.right { grid-area: right; }
+
+/* Media Queries para responsividad en pantallas más pequeñas */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2em;
+        margin-bottom: 20px;
+    }
+    #gameCanvas {
+        width: 95vw; /* Ocupa casi todo el ancho de la vista */
+        height: 95vw; /* Mantiene la proporción cuadrada */
+        max-width: 360px; /* Pero no más grande que un tamaño fijo */
+        max-height: 360px;
+    }
+    #controls {
+        gap: 10px;
+        padding: 15px;
+        margin-top: 25px;
+    }
+    .arrow-button {
+        width: 60px;
+        height: 60px;
+        font-size: 26px;
+        border-radius: 8px;
+    }
+    p#scoreDisplay {
+        font-size: 1.4em;
+    }
 }
 
-.left {
-    grid-column: 1;
-    grid-row: 2;
-}
-
-.right {
-    grid-column: 3;
-    grid-row: 2;
-}
-
-.down {
-    grid-column: 2;
-    grid-row: 3;
-}
-
-.empty {
-    /* Mantiene el espacio vacío en la cuadrícula, no visible */
-    visibility: hidden;
-    pointer-events: none; /* Asegura que no sea interactivo */
-}
