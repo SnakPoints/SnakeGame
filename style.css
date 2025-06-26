@@ -19,56 +19,57 @@ h1 {
 }
 
 #controls {
-    /* Cambios aquí para la nueva disposición */
-    display: grid; /* Usamos CSS Grid para un control preciso */
-    grid-template-columns: repeat(3, 1fr); /* Tres columnas de igual ancho */
-    grid-template-rows: repeat(3, 1fr); /* Tres filas de igual alto */
+    display: grid;
+    /* Define una cuadrícula de 3x3 para posicionar los botones */
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas de igual ancho */
+    grid-template-rows: repeat(3, 1fr);    /* 3 filas de igual alto */
     gap: 5px; /* Espacio entre los botones */
-    width: 250px; /* Ancho total de la cuadrícula de botones */
-    height: 250px; /* Alto total de la cuadrícula de botones */
+    width: 250px; /* Ancho total del área de control */
+    height: 250px; /* Alto total del área de control */
     margin-top: 10px;
-    align-items: center;
-    justify-items: center;
+    align-items: center; /* Centra los items verticalmente en sus celdas */
+    justify-items: center; /* Centra los items horizontalmente en sus celdas */
 }
 
 #controls button {
     background-color: #4CAF50;
     color: white;
     border: none;
-    padding: 15px; /* Ajustado para que el tamaño lo dé la cuadrícula */
+    padding: 0; /* Quitamos padding aquí para que width/height den el tamaño total */
     font-size: 24px;
     cursor: pointer;
     border-radius: 8px;
-    width: 100%; /* Ocupa todo el espacio de su celda en la cuadrícula */
-    height: 100%; /* Ocupa todo el espacio de su celda en la cuadrícula */
+    width: 80%; /* Ocupa la mayor parte de su celda */
+    height: 80%; /* Ocupa la mayor parte de su celda */
     display: flex;
     justify-content: center;
     align-items: center;
+    box-sizing: border-box; /* Para que padding/border no sumen al width/height */
 }
 
 #controls button:active {
     background-color: #45a049;
 }
 
-/* Posicionamiento específico de los botones en la cuadrícula */
+/* Posicionamiento de cada botón para formar la cruz */
 #upBtn {
-    grid-column: 2; /* Columna central */
-    grid-row: 1;    /* Fila superior */
+    grid-column: 2; /* Columna del medio */
+    grid-row: 1;    /* Fila de arriba */
 }
 
 #leftBtn {
-    grid-column: 1; /* Columna izquierda */
-    grid-row: 2;    /* Fila central */
+    grid-column: 1; /* Columna de la izquierda */
+    grid-row: 2;    /* Fila del medio */
 }
 
 #rightBtn {
-    grid-column: 3; /* Columna derecha */
-    grid-row: 2;    /* Fila central */
+    grid-column: 3; /* Columna de la derecha */
+    grid-row: 2;    /* Fila del medio */
 }
 
 #downBtn {
-    grid-column: 2; /* Columna central */
-    grid-row: 3;    /* Fila inferior */
+    grid-column: 2; /* Columna del medio */
+    grid-row: 3;    /* Fila de abajo */
 }
 
 p {
